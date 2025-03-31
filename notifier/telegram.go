@@ -19,12 +19,9 @@ func NewTelegram() Telegram {
 }
 
 func (t Telegram) Send(text string) (*http.Response, error) {
-	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s", t.botToken, t.chatID, text)
+	url := fmt.Sprintf(
+		"https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s",
+		t.botToken, t.chatID, text)
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return http.DefaultClient.Do(req)
+	return http.Get(url)
 }
