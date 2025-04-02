@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	// "fortalsurf/notifier"
-	// "io"
+	"fortalsurf/notifier"
+	"io"
 	"net/http"
 	"os"
-	"time"
 
 	"log"
 
@@ -35,52 +34,33 @@ func FetchSemaceReport() (Report, error) {
 	return reports[1], nil
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	// report, err := FetchSemaceReport()
-	//
-	// text := report.URL
-	// if err != nil {
-	// 	text = err.Error()
-	// }
-	//
-	// resp, err := notifier.Send(notifier.NewTelegram(), text)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	//
-	// respBody, err := io.ReadAll(resp.Body)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	//
-	// log.Println("Notifier response:", string(respBody))
-}
-
 func main() {
-	if err := godotenv.Load(); err != nil {
-		panic(err)
-	}
+	// if os.Getenv("ENVIRONMENT") != "prod" {
+	// 	if err := godotenv.Load(); err != nil {
+	// 		panic(err)
+	// 	}
+	// }
 
-	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	// 	report, err := FetchSemaceReport()
-	//
-	// 	text := report.URL
-	// 	if err != nil {
-	// 		text = err.Error()
-	// 	}
-	//
-	// 	resp, err := notifier.Send(notifier.NewTelegram(), text)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	//
-	// 	respBody, err := io.ReadAll(resp.Body)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	//
-	// 	log.Println("Notifier response:", string(respBody))
-	// })
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		report, err := FetchSemaceReport()
+
+		text := report.URL
+		if err != nil {
+			text = err.Error()
+		}
+
+		resp, err := notifier.Send(notifier.NewTelegram(), text)
+		if err != nil {
+			panic(err)
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		log.Println("Notifier response:", string(respBody))
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -88,22 +68,10 @@ func main() {
 		log.Printf("defaulting to port %s", port)
 	}
 
-	srv := http.Server{
-		Addr: ":"+port,
-		Handler: http.HandlerFunc(handler),
-		WriteTimeout:      30 * time.Second,
-		ReadTimeout:       30 * time.Second,
-		IdleTimeout:       30 * time.Second,
-		ReadHeaderTimeout: 30 * time.Second,
-	}
 
-	if err := srv.ListenAndServe(); err != nil {
+	log.Printf("listing on port %s", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal(err)
 	}
-
-	// log.Printf("listing on port %s", port)
-	// if err := http.ListenAndServe(":"+port, nil); err != nil {
-	// 	log.Fatal(err)
-	// }
 }
 
