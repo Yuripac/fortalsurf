@@ -10,7 +10,7 @@ import (
 	"log"
 
 	"github.com/gocolly/colly/v2"
-	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 )
 
 type Report struct {
@@ -35,11 +35,9 @@ func FetchSemaceReport() (Report, error) {
 }
 
 func main() {
-	// if os.Getenv("ENVIRONMENT") != "prod" {
-	// 	if err := godotenv.Load(); err != nil {
-	// 		panic(err)
-	// 	}
-	// }
+	if err := godotenv.Load(); err != nil {
+		log.Println(err)
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		report, err := FetchSemaceReport()
