@@ -10,7 +10,7 @@ import (
 	"log"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 )
 
 type Report struct {
