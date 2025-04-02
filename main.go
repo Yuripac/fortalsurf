@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"fortalsurf/notifier"
-	"io"
+	// "fortalsurf/notifier"
+	// "io"
 	"net/http"
 	"os"
 	"time"
@@ -36,24 +36,24 @@ func FetchSemaceReport() (Report, error) {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	report, err := FetchSemaceReport()
-
-	text := report.URL
-	if err != nil {
-		text = err.Error()
-	}
-
-	resp, err := notifier.Send(notifier.NewTelegram(), text)
-	if err != nil {
-		panic(err)
-	}
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	log.Println("Notifier response:", string(respBody))
+	// report, err := FetchSemaceReport()
+	//
+	// text := report.URL
+	// if err != nil {
+	// 	text = err.Error()
+	// }
+	//
+	// resp, err := notifier.Send(notifier.NewTelegram(), text)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//
+	// respBody, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//
+	// log.Println("Notifier response:", string(respBody))
 }
 
 func main() {
