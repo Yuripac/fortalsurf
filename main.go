@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"fortalsurf/notifier"
 	"io"
+	"net/http"
+	"os"
+
+	"log"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/joho/godotenv"
-	"log"
 )
 
 type Report struct {
@@ -31,30 +34,42 @@ func FetchSemaceReport() (Report, error) {
 	return reports[1], nil
 }
 
-
 func main() {
-	err := godotenv.Load()
-	if err != nil {
+	if err := godotenv.Load(); err != nil {
 		panic(err)
 	}
 
-	report, err := FetchSemaceReport()
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		report, err := FetchSemaceReport()
 
-	text := report.URL
-	if err != nil {
-		text = err.Error()
+		text := report.URL
+		if err != nil {
+			text = err.Error()
+		}
+
+		resp, err := notifier.Send(notifier.NewTelegram(), text)
+		if err != nil {
+			panic(err)
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		log.Println("Notifier response:", string(respBody))
+	})
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+		log.Printf("defaulting to port %s", port)
 	}
 
-	resp, err := notifier.Send(notifier.NewTelegram(), text)
-	if err != nil {
-		panic(err)
-	}
 
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
+	log.Printf("listing on port %s", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatal(err)
 	}
-
-	log.Println("Notifier response:", string(respBody))
 }
 

@@ -8,4 +8,6 @@ RUN go mod download
 
 RUN go build -o /fortalsurf
 
+EXPOSE 8080
+
 CMD ["/fortalsurf"]
