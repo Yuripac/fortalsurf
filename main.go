@@ -1,38 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"fortalsurf/notifier"
+	"fortalsurf/report"
 	"io"
 	"net/http"
 	"os"
 
 	"log"
 
-	"github.com/gocolly/colly/v2"
 	"github.com/joho/godotenv"
 )
-
-type Report struct {
-	URL string
-}
-
-func FetchSemaceReport() (Report, error) {
-	c := colly.NewCollector()
-	var reports []Report
-
-	c.OnHTML("ul[class='ListaEst -Verde'] a", func(e *colly.HTMLElement) {
-		reports = append(reports, Report{URL: e.Attr("href")})
-	})
-
-	c.Visit("https://www.semace.ce.gov.br/boletim-de-balneabilidade")
-
-	if len(reports) == 0 {
-		return Report{}, fmt.Errorf("Failed to find the last SEMACE's report")
-	}
-
-	return reports[1], nil
-}
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -40,7 +18,7 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		report, err := FetchSemaceReport()
+		report, err := report.SeaWater("")
 
 		text := report.URL
 		if err != nil {
@@ -63,7 +41,6 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
-		log.Printf("defaulting to port %s", port)
 	}
 
 
